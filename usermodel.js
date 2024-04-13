@@ -1,6 +1,6 @@
+const string = require("@hapi/joi/lib/types/string");
 const { default: mongoose } = require("mongoose")
 var mongo = require("mongoose")
-const paginate = require('mongoose-paginate')
 
 
 var details = new mongo.Schema({
@@ -9,8 +9,9 @@ var details = new mongo.Schema({
         required: true 
       }, 
       price: { 
-        type: Number, 
+        type: String, 
         required: true 
+
       }, 
       breed: { 
         type: String, 

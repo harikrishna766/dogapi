@@ -8,7 +8,7 @@ var details = new mongo.Schema({
      },
 
      phoneNumber: {
-        type: Number,
+        type: String,
         require: true,
         unique: true
     },
@@ -20,8 +20,17 @@ var details = new mongo.Schema({
     },
     password:{
         type:String
+    },
+    roleId:{
+        type:String,
+        require:true,
+
+    },
+    roleType:{
+        type:String,
+        require:true,
     }
-    
+
     
 })
 var userlogin= mongo.model('userlogin',details)

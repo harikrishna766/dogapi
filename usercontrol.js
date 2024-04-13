@@ -51,26 +51,24 @@ const allUsers = async (req, res) => {
 
     
 const store = async (req,res) => {
-
-  if (!req.body.name) {
-    console.log("iffffff");
+ console.log(req.body)
+  if (!req.body.price) {
     res.json({message: 'Plesde', status: 400})
   }else{
   let us = new usersModel({
-    name:req.body.name,
-    cellnumber:req.body.cellnumber,
-    branch:req.body.branch,
-    city:req.body.city
+    imagePath:req.body.file,
+    price:req.body.price,
+    breed:req.body.breed,
 })
     us.save()
     .then(response=>{
         res.json({
-           message:'add seccess'
+           message:response
         })
     })
     .catch(err => {
         res.json({
-            message:"error"
+            message:err
         })
     })
 

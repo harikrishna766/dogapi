@@ -1,8 +1,22 @@
 const model = require("./loginModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+var mongoose = require('mongoose')
 
-const register = (req, res, next) => {
+const ObjectId = mongoose.Types.ObjectId
+
+const register =async (req, res, next) => {
+  let checkEmail = await model.findOne({email:req.body.email})
+  let checkPhone = await model.findOne({phoneNumber:req.body.phoneNumber})
+
+  console.log(checkEmail,'================checkEmail')
+  if(checkEmail){
+    res.status(401).json({message:'EmailId is exists',status: 401})
+  }
+  else if (checkPhone){
+    res.status(401).json({message:'Phone Number is exists',status: 401})
+  }
+else{
   bcrypt.hash(req.body.password, 10, function (err, hashcode) {
     if (err) {
       res.json({ message: "eror", status: 400 });
@@ -12,17 +26,20 @@ const register = (req, res, next) => {
       phoneNumber: req.body.phoneNumber,
       email: req.body.email,
       password: hashcode,
+      roleId:'0',
+      roleType:"user"
     });
     user
       .save()
       .then((response) => {
-        res.json({ message: "add success", response });
+        res.json({ message: "add success", response ,status: 200});
       })
       .catch((error) => {
         console.log(error, "............");
         res.json({ message: "error" });
       });
   });
+}
 };
 
 const login = async (req, res, next) => {
@@ -43,10 +60,16 @@ const login = async (req, res, next) => {
             token = jwt.sign({ name: result.name, mail: result.email }, "secretValue", {
               expiresIn: "5m",
             });
+            let userData ={
+              name:result.name,
+              email: result.email,
+              roleId:result.roleId,
+              roleType:result.roleType
+            }
             console.log(token, 'token');
-            res.json({ message: "login success",
+            res.status(200).json({ message: "login success",
              status: 200,
-             result, 
+             userData, 
              token });
           
            
@@ -89,4 +112,35 @@ const forGotPassword = (req, res) => {
       });
   });
 };
-module.exports = { register, login, forGotPassword };
+
+const getUsers = async (req,res)=>{
+  try {
+  let usersData = await model.find()
+  if (usersData){
+    res.status(200).json({message:"Successfully Get User Data",usersData})
+  }
+  else{
+    res.status(400).json({message:"No Data Found",usersData})
+
+  }
+}
+catch (error) {
+  console.log(error,'------------------error')
+  res.status(500).json({error})
+
+}
+
+};
+
+const getOneData=(req,res)=>{
+  let id = req.params.id 
+  console.log(req.params.id)
+  model.findById({_id:ObjectId(id)})
+  .then(response=>{
+   res.json({response})
+  })
+  .catch(error => {
+   res.json({message:'error'})
+  })
+}
+module.exports = { register, login, forGotPassword,getUsers ,getOneData};
