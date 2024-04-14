@@ -51,22 +51,24 @@ const allUsers = async (req, res) => {
 
     
 const store = async (req,res) => {
- console.log(req.body)
-  if (!req.body.price) {
+    const data =JSON.parse(req.body.user)
+  if (!data.price) {
     res.json({message: 'Plesde', status: 400})
   }else{
   let us = new usersModel({
-    imagePath:req.body.file,
-    price:req.body.price,
-    breed:req.body.breed,
+    imagePath:req.file.originalname,
+    price:data.price,
+    breed:data.breed,
 })
     us.save()
     .then(response=>{
         res.json({
-           message:response
+           message:response,
+           status:200
         })
     })
     .catch(err => {
+        console.log(err,"-=================-=-=")
         res.json({
             message:err
         })
@@ -126,6 +128,24 @@ const deleteItem = (req,res )=>{
     })
 }
 
+const getAllDogs = async (req,res)=>{
+      
+    try {
+        let usersData = await usersModel.find()
+        if (usersData){
+          res.status(200).json({message:"Successfully Get User Data",usersData})
+        }
+        else{
+          res.status(400).json({message:"No Data Found",usersData})
+      
+        }
+      }
+      catch (error) {
+        console.log(error,'------------------error')
+        res.status(500).json({error})
+      
+      }}
+
 module.exports={
-    store,update,allUsers,getOneData,deleteItem
+    store,update,allUsers,getOneData,deleteItem,getAllDogs
 }
