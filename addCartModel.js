@@ -4,6 +4,7 @@ var mongo = require("mongoose")
 
 
 var details = new mongo.Schema({
+
     imagePath: { 
         type: String, 
         required: true 
@@ -17,18 +18,12 @@ var details = new mongo.Schema({
         type: String, 
         required: true 
       } ,
-      colour: { 
+      status: { 
         type: String, 
-      },
-      petAge: { 
-        type: String, 
-      },
-      About: { 
-        type: String, 
-      }
+      } 
     
 })
-var dogDetails= mongo.model('dogDetails',details)
+var addcart= mongo.model('addcartDetails',details)
 
-module.exports= dogDetails;
+module.exports= addcart;
 

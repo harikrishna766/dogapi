@@ -1,5 +1,7 @@
 const { response } = require('express')
 const usersModel = require('./usermodel')
+const userBuyProducts=require('./buyModel')
+const addcartproducts=require('./addCartModel')
 var mongoose = require('mongoose')
 var paginate =  require('mongoose-paginate')
 
@@ -51,30 +53,50 @@ const allUsers = async (req, res) => {
 
     
 const store = async (req,res) => {
-    const data =JSON.parse(req.body.user)
-  if (!data.price) {
-    res.json({message: 'Plesde', status: 400})
-  }else{
-  let us = new usersModel({
-    imagePath:req.file.originalname,
-    price:data.price,
-    breed:data.breed,
-})
-    us.save()
-    .then(response=>{
-        res.json({
-           message:response,
-           status:200
-        })
+    try{
+        const data =JSON.parse(req.body.user)
+    if (
+        data.price == '' || data.price == null ||
+        data.breed == '' || data.breed == null ||
+        data.colour == '' || data.colour == null ||
+        data.petAge == '' || data.petAge == null ||
+        data.About == '' || data.About == null
+    ) {
+        res.json({ message: 'Please enter details for all fields', status: 400 });
+    }
+      else{
+      let us = new usersModel({
+        imagePath:req.file.originalname,
+        price:data.price,
+        breed:data.breed,
+        colour:data.colour,
+        petAge:data.petAge,
+        About:data.About
+    
     })
-    .catch(err => {
+        us.save()
+        .then(response=>{
+            res.json({
+               message:response,
+               status:200
+            })
+        })
+        .catch(err => {
+            console.log(err,"-=================-=-=")
+            res.json({
+                message:err
+            })
+        })
+    
+    }
+    }
+    catch(err){
         console.log(err,"-=================-=-=")
         res.json({
             message:err
         })
-    })
-
-}
+    }
+   
 
     
 }
@@ -146,6 +168,127 @@ const getAllDogs = async (req,res)=>{
       
       }}
 
+      const singleRecord = async (req, res) => {
+        try {
+            let id = req.params.id;
+            const singlerecord = await usersModel.findOne({ _id: ObjectId(id) });
+            console.log(singlerecord, 'ppppppppppppppp');
+            res.json({ message: "Successfully get Single Record", status: 200,data:singlerecord });
+        } 
+        catch (error) {
+            console.error(error);
+            res.status(400).json({ message: "Something went wrong", status: 400 });
+        }
+    }
+    
+    const buyProducts = async (req,res) => {
+        try{
+            if( req.body.address ==''|| req.body.address == null || req.body.PhoneNumber ==''|| req.body.PhoneNumber == null){
+              res.json({message:'please Enter Address and PhoneNumber', status:400 })
+            }
+        else{
+      let us = new userBuyProducts({
+        imagePath:req.body.imagePath,
+        price:req.body.price,
+        breed:req.body.breed,
+        address:req.body.address,
+        PhoneNumber:req.body.PhoneNumber,
+    })
+    console.log(us,'buyProductsbuyProducts==============')
+       let q= us.save()
+        .then(response=>{
+            res.json({
+               message1:response,
+               status:200,
+               data:q,
+               message:"successfully Buying Product"
+            })
+        })
+        .catch(err => {
+            console.log(err,"-=================-=-=")
+            res.json({
+                message:err
+            })
+        })
+        }
+    }
+        catch(err){
+            console.log(err,"-=================-=-=")
+
+        }
+        
+    }
+    
+    const addcart=async(req,res)=>{
+        try{
+            
+            let us = new addcartproducts({
+                imagePath:req.body.imagePath,
+                price:req.body.price,
+                breed:req.body.breed,
+                status:'productaddingcart'
+            })
+            console.log(us,'addcartaddcart==============')
+                us.save()
+    
+                .then(response=>{
+                    res.json({
+                       message1:response,
+                       status:200,
+                       message:"successfully AddProduct"
+                    })
+                })
+                .catch(err => {
+                    console.log(err,"-=================-=-=")
+                    res.json({
+                        message:err
+                    })
+                })
+            
+        }
+        catch(err){
+            console.log(err,"-=================-=-=")
+
+        }
+        
+    }
+    const buyAllData=async (req,res) => {
+    try {
+        let usersData = await userBuyProducts.find()
+        if (usersData){
+          res.status(200).json({message:"Successfully Get userBuyProducts Data",usersData})
+          console.log(usersData,'==================')
+        }
+        else{
+          res.status(400).json({message:"No Data Found",usersData})
+      
+        }
+      }
+      catch (error) {
+        console.log(error,'------------------error')
+        res.status(500).json({error})
+      
+      }}
+
+      const AddcartAllData=async (req,res) => {
+        try {
+            let usersData = await addcartproducts.find()
+            if (usersData){
+              res.status(200).json({message:"Successfully Get userBuyProducts Data",usersData})
+              console.log(usersData,'==================')
+            }
+            else{
+              res.status(400).json({message:"No Data Found",usersData})
+          
+            }
+          }
+          catch (error) {
+            console.log(error,'------------------error')
+            res.status(500).json({error})
+          
+          }}
+    
+       
 module.exports={
-    store,update,allUsers,getOneData,deleteItem,getAllDogs
+    store,update,allUsers,getOneData,deleteItem,getAllDogs,singleRecord,buyProducts,buyAllData,addcart,AddcartAllData
 }
